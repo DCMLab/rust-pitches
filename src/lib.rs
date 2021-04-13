@@ -1,7 +1,9 @@
 use core::ops::{Add, Mul, Neg, Sub};
 use std::cmp::Ordering;
 
+pub mod midi;
 pub mod spelled;
+mod util;
 
 // interval traits
 // ---------------

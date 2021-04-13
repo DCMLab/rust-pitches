@@ -1,10 +1,13 @@
+use crate::util::parsing::parse_nat;
+use crate::util::parsing::parse_int;
+use crate::util::parsing::parse_negative;
+use super::*;
 use nom::branch::alt;
-use nom::character::complete::{char, digit1, one_of};
+use nom::character::complete::{char, one_of};
 use nom::combinator::{eof, map, map_res, opt};
 use nom::multi::many1_count;
 use nom::IResult;
 use std::convert::TryFrom;
-use crate::spelled::*;
 
 enum Qual {
     Augmented(i32),
@@ -64,23 +67,6 @@ fn parse_dia(i: &str) -> IResult<&str, i32, ()> {
         }
     };
     Ok((o_dia, ((dia * 2 + 1) % 7) - 1 + (7 * alteration)))
-}
-
-fn parse_negative(i: &str) -> (&str, bool) {
-    match char::<&str, ()>('-')(i) {
-        Ok((i, _)) => (i, true),
-        Err(_) => (i, false),
-    }
-}
-
-fn parse_nat(i: &str) -> IResult<&str, i32, ()> {
-    map_res(digit1, |x| i32::from_str(x))(i)
-}
-
-fn parse_int(i: &str) -> IResult<&str, i32, ()> {
-    let (i, neg) = parse_negative(i);
-    let (i, n) = parse_nat(i)?;
-    Ok((i, if neg { -n } else { n }))
 }
 
 fn parse_octs(i: &str) -> IResult<&str, i32, ()> {

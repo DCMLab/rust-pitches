@@ -1,5 +1,4 @@
-use crate::Pitch;
-use crate::{Chromatic, Diatonic, Interval, IntervalClass};
+use super::{Chromatic, Diatonic, Interval, IntervalClass, Pitch};
 use std::cmp::Ordering;
 use std::fmt::Display;
 use std::ops::{Add, Mul, Neg, Sub};
@@ -188,6 +187,13 @@ impl Display for SpelledInterval {
     }
 }
 
+impl FromStr for SpelledInterval {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        parsing::parse_spelled(s).or_else(|_| Err("Failed to parse interval ".to_string() + s))
+    }
+}
+
 // SpelledIC
 // ---------
 
@@ -313,6 +319,15 @@ impl Display for SpelledIC {
     }
 }
 
+impl FromStr for SpelledIC {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        parsing::parse_sic(s)
+            .or_else(|_| Err("Failed to parse spelled interval class ".to_string() + s))
+    }
+}
+
 // Spelled Pitch (Class)
 // ---------------------
 
@@ -348,48 +363,32 @@ impl<I: Interval + Spelled> Pitch<I> {
     }
 }
 
-pub fn spelledp(f: i32, o: i32) -> Pitch<SpelledInterval> {
+pub type SpelledPitch = Pitch<SpelledInterval>;
+pub type SpelledPC = Pitch<SpelledIC>;
+
+pub fn spelledp(f: i32, o: i32) -> SpelledPitch {
     SpelledInterval::new(f, o).to_pitch()
 }
 
-pub fn spc(f: i32) -> Pitch<SpelledIC> {
+pub fn spc(f: i32) -> SpelledPC {
     SpelledIC::new(f).to_pitch()
 }
 
-impl Display for Pitch<SpelledInterval> {
+impl Display for SpelledPitch {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         let accs = accstr(self.alteration(), "♯", "♭");
         write!(fmt, "{}{}{}", self.letter(), accs, self.octaves())
     }
 }
 
-impl Display for Pitch<SpelledIC> {
+impl Display for SpelledPC {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         let accs = accstr(self.alteration(), "♯", "♭");
         write!(fmt, "{}{}", self.letter(), accs)
     }
 }
 
-// parsing notation
-// ----------------
-
-impl FromStr for SpelledInterval {
-    type Err = String;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        parsing::parse_spelled(s).or_else(|_| Err("Failed to parse interval ".to_string() + s))
-    }
-}
-
-impl FromStr for SpelledIC {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        parsing::parse_sic(s)
-            .or_else(|_| Err("Failed to parse spelled interval class ".to_string() + s))
-    }
-}
-
-impl FromStr for Pitch<SpelledInterval> {
+impl FromStr for SpelledPitch {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -398,7 +397,7 @@ impl FromStr for Pitch<SpelledInterval> {
     }
 }
 
-impl FromStr for Pitch<SpelledIC> {
+impl FromStr for SpelledPC {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -460,11 +459,11 @@ mod tests {
         s.parse().unwrap()
     }
 
-    fn rsp(s: &str) -> Pitch<SpelledInterval> {
+    fn rsp(s: &str) -> SpelledPitch {
         s.parse().unwrap()
     }
 
-    fn rspc(s: &str) -> Pitch<SpelledIC> {
+    fn rspc(s: &str) -> SpelledPC {
         s.parse().unwrap()
     }
 
