@@ -1,5 +1,7 @@
 # pitches (Rust)
 
+[![Tests](https://github.com/DCMLab/rust-pitches/actions/workflows/tests.yml/badge.svg)](https://github.com/DCMLab/rust-pitches/actions/workflows/tests.yml)
+
 Provides types and traits for representing and working with intervals and pitches.
 Follows the same API and notation formats as the companion libraries:
 - [Pitches.jl](https://github.com/DCMLab/Pitches.jl/) (Julia)
