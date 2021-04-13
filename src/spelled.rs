@@ -449,7 +449,7 @@ fn fifths2degree(fifths: i32) -> i32 {
 
 #[cfg(test)]
 mod tests {
-    use crate::spelled::*;
+    use super::*;
 
     fn rsi(s: &str) -> SpelledInterval {
         s.parse().unwrap()
