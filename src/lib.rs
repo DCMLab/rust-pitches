@@ -1,3 +1,71 @@
+//! This crate provides types and traits for dealing with musical pitch.
+//!
+//! The two main goals are:
+//! - providing types and operations (such as arithmetics, printing and parsing) for common types of pitches and intervals
+//! - providing a generic interface for writing code that is agnostic to the specific pitch or interval types.
+//! It allows you to write generic algorithms that can then be applied
+//! to pitches and intervals in different formats:
+//! ```rust
+//! use pitches::midi::*;
+//! use pitches::spelled::*;
+//! use pitches::*;
+//!
+//! fn transpose_and_add_octave<I>(pitches: &Vec<Pitch<I>>, by: I) -> Vec<Pitch<I>>
+//! where
+//!     I: Interval,
+//! {
+//!     pitches.iter().map(|p| *p + by + I::OCTAVE).collect()
+//! }
+//!
+//! fn main() {
+//!     // apply to MIDI pitches/intervals
+//!     println!("MIDI:");
+//!     let midi_pitches = vec![midip(60), midip(64), midip(67), midip(72)];
+//!     for p in transpose_and_add_octave(&midi_pitches, midi(3)).iter() {
+//!         println!("- {}", p);
+//!     }
+//!
+//!     // apply to spelled pitches/intervals
+//!     println!("spelled:");
+//!     let spelled_pitches: Vec<SpelledPitch> = vec!["C4", "E♭4", "G♯4", "C5"]
+//!         .iter()
+//!         .map(|s| s.parse().unwrap())
+//!         .collect();
+//!     let spelled_interval = "M3:0".parse().unwrap();
+//!     for p in transpose_and_add_octave(&spelled_pitches, spelled_interval).iter() {
+//!         println!("- {}", p);
+//!     }
+//! }
+//! ```
+//! Output:
+//! ```text
+//! MIDI:
+//! - p75
+//! - p79
+//! - p82
+//! - p87
+//! spelled:
+//! - E5
+//! - G5
+//! - B♯5
+//! - E6
+//! ```
+//!
+//! The fundamental idea behind this library is that the central object is the *interval*.
+//! Pitches are derived from intervals by interpreting them with respect to a reference point.
+//! This is much like the relation between vectors (= intervals) and points (= pitches).
+//! For example, the pitch `E♭4` can be represented as an interval (e.g. a minor third, `m3:0`)
+//! above a reference pitch such as Middle C (`C4`).
+//! The concept of an interval is represented by the [`Interval`] trait.
+//!
+//! Similar to vectors and points, intervals and pitches support a number of operations
+//! such as addition and scalar multiplication,
+//! which are here implemented using the standard operator traits.
+//!
+//! For a detailed introduction to the concepts behind this library,
+//! have a look at the abstract [interface description](https://hackmd.io/@chfin/ryWI3NJRL),
+//! as well as the docs of the [Julia implementation](https://dcmlab.github.io/Pitches.jl/dev/)
+
 use core::ops::{Add, Mul, Neg, Sub};
 use std::cmp::Ordering;
 
