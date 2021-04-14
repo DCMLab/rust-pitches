@@ -1,3 +1,39 @@
+//! MIDI (chromatic / enharmonic / 12-tone) intervals and pitches.
+//!
+//! Represents intervals and pitches in the 12TET system,
+//! where each octave is split into 12 equal (neutral) semitones.
+//! This system is simpler but also less nuanced
+//! than e.g. the "spelled" pitches and intervals used in traditional Western notation.
+//! It enforces enharmonic equivalence,
+//! so that pitches such as C♯ and D♭ are represented by the same object.
+//! This representation is appropriate either when the input or output format is MIDI-like,
+//! or when enharonic equivalence is assumed.
+//!
+//! Intervals are represented as integers that count semitones.
+//! Pitches are similarly represented as integers with C4 = 60, as in the MIDI standard.
+//! Interval and pitch classes are constrained to values between 0 and 11,
+//! which is enforced in their constructors and operations using modular arithmetics.
+//! Types are distinguished using newtypes, using internal [`i32`]s.
+//!
+//! # Notation
+//!
+//! The types in this module use a string notation that is based on integers
+//! with a prefix to distinguish different types.
+//! The integers must be written as decimal digits (without auxiliary underscores etc.)
+//! With an optional sign between the prefix and the number for non-"class" types.
+//!
+//! ```text
+//! Type          Prefix  Examples
+//! MidiInterval  i       i3, i14, i-8
+//! MidiIC        ic      ic0, ..., ic11
+//! MidiPitch     p       p60, p43, p-2
+//! MidiPC        pc      pc0, ..., pc11
+//! ```
+//!
+//! If you are using an input or output format that represents MIDI pitches as raw integers,
+//! you can achieve this by manually converting them from and to integers using the constructors
+//! and the [`From`] and [`Into`] instances between the types of this module and [`i32`].
+
 use super::{Chromatic, Diatonic, Interval, IntervalClass, Pitch};
 use std::cmp::Ordering;
 use std::fmt::Display;
@@ -8,16 +44,34 @@ mod parsing;
 
 // Midi Interval
 
+/// MIDI intervals.
+///
+/// A newtype wrapper around [`i32`].
+/// All operations behave just like integers.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MidiInterval(i32);
 
+/// Creates a midi interval from an integer.
 pub fn midi(i: i32) -> MidiInterval {
     MidiInterval(i)
 }
 
 impl MidiInterval {
+    /// Creates a midi interval from an integer.
     pub fn new(i: i32) -> MidiInterval {
         midi(i)
+    }
+}
+
+impl From<i32> for MidiInterval {
+    fn from(i: i32) -> MidiInterval {
+        midi(i)
+    }
+}
+
+impl From<MidiInterval> for i32 {
+    fn from(i: MidiInterval) -> i32 {
+        i.0
     }
 }
 
@@ -86,16 +140,43 @@ impl FromStr for MidiInterval {
 
 // Midi Interval Class
 
+/// MIDI interval classes.
+///
+/// A newtype wrapper around [`i32`] that ensures values between `0` and `11`.
+/// All operations behave like integeres modulo 12.
+///
+/// Since interval classes are circular, they have no musically interpretable order.
+/// The [`Ord`] instance only provides an ordering
+/// by the representants in the first octave for convenience.
+///
+/// The [`direction`](Interval::direction) of a `MidiIC`
+/// is determined by its smallest absolute representant modulo 12
+/// (e.g. `-3` rather than `9`),
+/// with unisons (`0`) and tritones (`+/-6`) being neutral.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MidiIC(i32);
 
+/// Creates a midi interval class from an integer, wrapping octaves.
 pub fn midic(i: i32) -> MidiIC {
     MidiIC(i.rem_euclid(12))
 }
 
 impl MidiIC {
+    /// Creates a midi interval class from an integer, wrapping octaves.
     pub fn new(i: i32) -> MidiIC {
         midic(i)
+    }
+}
+
+impl From<i32> for MidiIC {
+    fn from(i: i32) -> MidiIC {
+        midic(i)
+    }
+}
+
+impl From<MidiIC> for i32 {
+    fn from(i: MidiIC) -> i32 {
+        i.0
     }
 }
 
@@ -177,15 +258,51 @@ impl FromStr for MidiIC {
 // Midi Pitch (Class)
 // ------------------
 
+/// MIDI pitches.
+///
+/// Represent chromatic pitches as integers, with C4 = `60`.
 pub type MidiPitch = Pitch<MidiInterval>;
+
+/// MIDI pitch classes.
+///
+/// Represents chromatic pitch classes as integers from `0` (C) to `11` (B).
+///
+/// Since pitch classes are circular, they have no musically interpretable order.
+/// The [`Ord`] instance only provides an arbitrary ordering from C to B for convenience.
 pub type MidiPC = Pitch<MidiIC>;
 
+/// Creates a MIDI pitch from an integer.
 pub fn midip(i: i32) -> MidiPitch {
     midi(i).to_pitch()
 }
 
+/// Creates a MIDI pitch class from an integer, wrapping octaves.
 pub fn midipc(i: i32) -> MidiPC {
     midic(i).to_pitch()
+}
+
+impl From<i32> for MidiPitch {
+    fn from(i: i32) -> MidiPitch {
+        midip(i)
+    }
+}
+
+impl From<MidiPitch> for i32 {
+    fn from(i: MidiPitch) -> i32 {
+        i.0 .0
+    }
+}
+
+impl From<i32> for MidiPC {
+    fn from(i: i32) -> MidiPC {
+        midipc(i)
+    }
+}
+
+impl From<MidiPC> for i32 {
+    fn from(i: MidiPC) -> i32 {
+        i.0 .0
+    }
 }
 
 impl Display for MidiPitch {
@@ -398,8 +515,8 @@ mod tests {
         assert_eq!(midip(63) + midi(7), midip(70));
         assert_eq!(midip(64) + midi(-4), midip(60));
         assert_eq!(midip(63) - midi(7), midip(56));
-        assert_eq!(midip(67).from(midip(61)), midi(6));
-        assert_eq!(midip(67).to(midip(61)), midi(-6));
+        assert_eq!(midip(67).interval_from(midip(61)), midi(6));
+        assert_eq!(midip(67).interval_to(midip(61)), midi(-6));
     }
 
     #[test]
@@ -407,7 +524,19 @@ mod tests {
         assert_eq!(midipc(63) + midic(7), midipc(70));
         assert_eq!(midipc(64) + midic(-4), midipc(60));
         assert_eq!(midipc(63) - midic(7), midipc(56));
-        assert_eq!(midipc(67).from(midipc(61)), midic(6));
-        assert_eq!(midipc(67).to(midipc(61)), midic(-6));
+        assert_eq!(midipc(67).interval_from(midipc(61)), midic(6));
+        assert_eq!(midipc(67).interval_to(midipc(61)), midic(-6));
+    }
+
+    #[test]
+    fn midi_integer_conversion() {
+        assert_eq!(midi(60), MidiInterval::from(60));
+        assert_eq!(i32::from(midi(60)), 60);
+        assert_eq!(midic(60), MidiIC::from(60));
+        assert_eq!(i32::from(midic(60)), 0);
+        assert_eq!(midip(60), MidiPitch::from(60));
+        assert_eq!(i32::from(midip(60)), 60);
+        assert_eq!(midipc(60), MidiPC::from(60));
+        assert_eq!(i32::from(midipc(60)), 0);
     }
 }
