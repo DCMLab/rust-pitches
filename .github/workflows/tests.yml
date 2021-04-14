@@ -21,7 +21,7 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - name: Build docs
-      run: cargo docs --no-deps --lib --verbose
+      run: cargo doc --no-deps --lib --verbose
     - name: Deploy docs
       uses: peaceiris/actions-gh-pages@v3
       with:
