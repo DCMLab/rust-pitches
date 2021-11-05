@@ -1,7 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/midi.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>midi.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../pitches/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;midi.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>midi.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../pitches/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -543,8 +540,7 @@
 <span id="540">540</span>
 <span id="541">541</span>
 <span id="542">542</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! MIDI (chromatic / enharmonic / 12-tone) intervals and pitches.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! MIDI (chromatic / enharmonic / 12-tone) intervals and pitches.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Represents intervals and pitches in the 12TET system,</span>
 <span class="doccomment">//! where each octave is split into 12 equal (neutral) semitones.</span>
@@ -581,10 +577,10 @@
 <span class="doccomment">//! and the [`From`] and [`Into`] instances between the types of this module and [`i32`].</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Chromatic</span>, <span class="ident">Diatonic</span>, <span class="ident">Interval</span>, <span class="ident">IntervalClass</span>, <span class="ident">Pitch</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">Add</span>, <span class="ident">Mul</span>, <span class="ident">Neg</span>, <span class="ident">Sub</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
+<span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
+<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Add</span>, <span class="ident">Mul</span>, <span class="ident">Neg</span>, <span class="ident">Sub</span>};
+<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
 <span class="kw">mod</span> <span class="ident">parsing</span>;
 
@@ -654,7 +650,7 @@
     <span class="kw">const</span> <span class="ident">OCTAVE</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">MidiInterval</span>(<span class="number">12</span>);
     <span class="kw">const</span> <span class="ident">UNISON</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">MidiInterval</span>(<span class="number">0</span>);
     <span class="kw">fn</span> <span class="ident">ic</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MidiIC</span> {
-        <span class="ident">MidiIC</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="number">0</span>)
+        <span class="ident">MidiIC::new</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
     <span class="kw">fn</span> <span class="ident">direction</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="number">0</span>)
@@ -672,15 +668,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">MidiInterval</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">fmt</span>, <span class="string">&quot;i{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">std::fmt::Error</span><span class="op">&gt;</span> {
+        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;i{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">MidiInterval</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">String</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MidiInterval</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
-        <span class="ident">parsing</span>::<span class="ident">parse_i</span>(<span class="ident">s</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Failed to parse midi interval &quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">s</span>))
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MidiInterval</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+        <span class="ident">parsing::parse_i</span>(<span class="ident">s</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Failed to parse midi interval &quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">s</span>))
     }
 }
 
@@ -759,11 +755,11 @@
     <span class="kw">const</span> <span class="ident">OCTAVE</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">MidiIC</span>(<span class="number">0</span>);
     <span class="kw">const</span> <span class="ident">UNISON</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">MidiIC</span>(<span class="number">0</span>);
     <span class="kw">fn</span> <span class="ident">ic</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MidiIC</span> {
-        <span class="ident">MidiIC</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="number">0</span>)
+        <span class="ident">MidiIC::new</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
     <span class="kw">fn</span> <span class="ident">direction</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">Ordering</span>::<span class="ident">Equal</span>
+            <span class="ident">Ordering::Equal</span>
         } <span class="kw">else</span> {
             <span class="number">6</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
         }
@@ -788,15 +784,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">MidiIC</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">fmt</span>, <span class="string">&quot;ic{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">std::fmt::Error</span><span class="op">&gt;</span> {
+        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;ic{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">MidiIC</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">String</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MidiIC</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
-        <span class="ident">parsing</span>::<span class="ident">parse_ic</span>(<span class="ident">s</span>)
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MidiIC</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+        <span class="ident">parsing::parse_ic</span>(<span class="ident">s</span>)
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Failed to parse midi interval class &quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">s</span>))
     }
 }
@@ -852,28 +848,28 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">MidiPitch</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">fmt</span>, <span class="string">&quot;p{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span> .<span class="number">0</span>)
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">std::fmt::Error</span><span class="op">&gt;</span> {
+        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;p{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span> .<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">MidiPC</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">fmt</span>, <span class="string">&quot;pc{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span> .<span class="number">0</span>)
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">std::fmt::Error</span><span class="op">&gt;</span> {
+        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;pc{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span> .<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">MidiPitch</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">String</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MidiPitch</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
-        <span class="ident">parsing</span>::<span class="ident">parse_p</span>(<span class="ident">s</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Failed to parse midi pitch &quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">s</span>))
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MidiPitch</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+        <span class="ident">parsing::parse_p</span>(<span class="ident">s</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Failed to parse midi pitch &quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">s</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">MidiPC</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">String</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MidiPC</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
-        <span class="ident">parsing</span>::<span class="ident">parse_pc</span>(<span class="ident">s</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Failed to parse midi pitch class &quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">s</span>))
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MidiPC</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+        <span class="ident">parsing::parse_pc</span>(<span class="ident">s</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Failed to parse midi pitch class &quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">s</span>))
     }
 }
 
@@ -899,7 +895,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_interval_props</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MidiInterval</span>::<span class="ident">UNISON</span>, <span class="ident">midi</span>(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">MidiInterval::UNISON</span>, <span class="ident">midi</span>(<span class="number">0</span>));
         <span class="comment">//todo: neutral wrt addition</span>
         <span class="comment">//todo: direction and negate</span>
         <span class="comment">//todo: - = +(-)</span>
@@ -909,183 +905,184 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_constructors</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midip</span>(<span class="number">42</span>), <span class="ident">midi</span>(<span class="number">42</span>).<span class="ident">to_pitch</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midipc</span>(<span class="number">21</span>), <span class="ident">midic</span>(<span class="number">21</span>).<span class="ident">to_pitch</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">midip</span>(<span class="number">42</span>), <span class="ident">midi</span>(<span class="number">42</span>).<span class="ident">to_pitch</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">midipc</span>(<span class="number">21</span>), <span class="ident">midic</span>(<span class="number">21</span>).<span class="ident">to_pitch</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_named</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MidiInterval</span>::<span class="ident">UNISON</span>, <span class="ident">midi</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MidiInterval</span>::<span class="ident">OCTAVE</span>, <span class="ident">midi</span>(<span class="number">12</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MidiInterval</span>::<span class="ident">CHROMATIC_SEMITONE</span>, <span class="ident">midi</span>(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">MidiInterval::UNISON</span>, <span class="ident">midi</span>(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">MidiInterval::OCTAVE</span>, <span class="ident">midi</span>(<span class="number">12</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">MidiInterval::CHROMATIC_SEMITONE</span>, <span class="ident">midi</span>(<span class="number">1</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MidiIC</span>::<span class="ident">UNISON</span>, <span class="ident">midic</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MidiIC</span>::<span class="ident">OCTAVE</span>, <span class="ident">midic</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MidiIC</span>::<span class="ident">CHROMATIC_SEMITONE</span>, <span class="ident">midic</span>(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">MidiIC::UNISON</span>, <span class="ident">midic</span>(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">MidiIC::OCTAVE</span>, <span class="ident">midic</span>(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">MidiIC::CHROMATIC_SEMITONE</span>, <span class="ident">midic</span>(<span class="number">1</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_parsing</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;i16&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midi</span>(<span class="number">16</span>)));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;i-4&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midi</span>(<span class="op">-</span><span class="number">4</span>)));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;p60&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midip</span>(<span class="number">60</span>)));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;p-1&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midip</span>(<span class="op">-</span><span class="number">1</span>)));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;ic13&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midic</span>(<span class="number">1</span>)));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;ic1&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midic</span>(<span class="number">13</span>)));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;pc0&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midipc</span>(<span class="number">0</span>)));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;pc13&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midipc</span>(<span class="number">1</span>)));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;i16&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midi</span>(<span class="number">16</span>)));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;i-4&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midi</span>(<span class="op">-</span><span class="number">4</span>)));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;p60&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midip</span>(<span class="number">60</span>)));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;p-1&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midip</span>(<span class="op">-</span><span class="number">1</span>)));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;ic13&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midic</span>(<span class="number">1</span>)));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;ic1&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midic</span>(<span class="number">13</span>)));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;pc0&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midipc</span>(<span class="number">0</span>)));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;pc13&quot;</span>.<span class="ident">parse</span>(), <span class="prelude-val">Ok</span>(<span class="ident">midipc</span>(<span class="number">1</span>)));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_printing</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">rmi</span>(<span class="string">&quot;i16&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;i16&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">rmp</span>(<span class="string">&quot;p63&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;p63&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">rmic</span>(<span class="string">&quot;ic3&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;ic3&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">rmpc</span>(<span class="string">&quot;pc5&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;pc5&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">rmi</span>(<span class="string">&quot;i16&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;i16&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">rmp</span>(<span class="string">&quot;p63&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;p63&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">rmic</span>(<span class="string">&quot;ic3&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;ic3&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">rmpc</span>(<span class="string">&quot;pc5&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;pc5&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_additive</span>() {
         <span class="comment">// todo: replace by property tests?</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">3</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="number">4</span>), <span class="ident">midi</span>(<span class="number">7</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">3</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="number">11</span>), <span class="ident">midi</span>(<span class="number">14</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">7</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="number">7</span>), <span class="ident">midi</span>(<span class="number">14</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="op">-</span><span class="number">3</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="number">4</span>), <span class="ident">midi</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">3</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="op">-</span><span class="number">4</span>), <span class="ident">midi</span>(<span class="op">-</span><span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">3</span>) <span class="op">-</span> <span class="ident">midi</span>(<span class="number">4</span>), <span class="ident">midi</span>(<span class="op">-</span><span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">3</span>) <span class="op">-</span> <span class="ident">midi</span>(<span class="number">9</span>), <span class="ident">midi</span>(<span class="op">-</span><span class="number">6</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="op">-</span><span class="ident">midi</span>(<span class="number">5</span>), <span class="ident">midi</span>(<span class="op">-</span><span class="number">5</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="op">-</span><span class="ident">midi</span>(<span class="number">5</span>), <span class="ident">midi</span>(<span class="number">7</span>) <span class="op">-</span> <span class="ident">midi</span>(<span class="number">12</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="op">-</span><span class="ident">midi</span>(<span class="number">7</span>), <span class="ident">MidiInterval</span>::<span class="ident">UNISON</span> <span class="op">-</span> <span class="ident">midi</span>(<span class="number">7</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">3</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="number">4</span>), <span class="ident">midi</span>(<span class="number">7</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">3</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="number">11</span>), <span class="ident">midi</span>(<span class="number">14</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">7</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="number">7</span>), <span class="ident">midi</span>(<span class="number">14</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="op">-</span><span class="number">3</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="number">4</span>), <span class="ident">midi</span>(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">3</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="op">-</span><span class="number">4</span>), <span class="ident">midi</span>(<span class="op">-</span><span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">3</span>) <span class="op">-</span> <span class="ident">midi</span>(<span class="number">4</span>), <span class="ident">midi</span>(<span class="op">-</span><span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">3</span>) <span class="op">-</span> <span class="ident">midi</span>(<span class="number">9</span>), <span class="ident">midi</span>(<span class="op">-</span><span class="number">6</span>));
+        <span class="macro">assert_eq!</span>(<span class="op">-</span><span class="ident">midi</span>(<span class="number">5</span>), <span class="ident">midi</span>(<span class="op">-</span><span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(<span class="op">-</span><span class="ident">midi</span>(<span class="number">5</span>), <span class="ident">midi</span>(<span class="number">7</span>) <span class="op">-</span> <span class="ident">midi</span>(<span class="number">12</span>));
+        <span class="macro">assert_eq!</span>(<span class="op">-</span><span class="ident">midi</span>(<span class="number">7</span>), <span class="ident">MidiInterval::UNISON</span> <span class="op">-</span> <span class="ident">midi</span>(<span class="number">7</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_multiplication</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">7</span>) <span class="op">*</span> <span class="number">2</span>, <span class="ident">midi</span>(<span class="number">14</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">7</span>) <span class="op">*</span> <span class="number">2</span>, <span class="ident">midi</span>(<span class="number">14</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_direction</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">1</span>).<span class="ident">direction</span>(), <span class="ident">Ordering</span>::<span class="ident">Greater</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">0</span>).<span class="ident">direction</span>(), <span class="ident">Ordering</span>::<span class="ident">Equal</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="op">-</span><span class="number">1</span>).<span class="ident">direction</span>(), <span class="ident">Ordering</span>::<span class="ident">Less</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="op">-</span><span class="number">3</span>).<span class="ident">abs</span>(), <span class="ident">midi</span>(<span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">1</span>).<span class="ident">direction</span>(), <span class="ident">Ordering::Greater</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">0</span>).<span class="ident">direction</span>(), <span class="ident">Ordering::Equal</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="op">-</span><span class="number">1</span>).<span class="ident">direction</span>(), <span class="ident">Ordering::Less</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="op">-</span><span class="number">3</span>).<span class="ident">abs</span>(), <span class="ident">midi</span>(<span class="number">3</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_class_conversion</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">14</span>).<span class="ident">ic</span>(), <span class="ident">midic</span>(<span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="op">-</span><span class="number">14</span>).<span class="ident">ic</span>(), <span class="ident">midic</span>(<span class="number">10</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">14</span>).<span class="ident">ic</span>(), <span class="ident">midic</span>(<span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="op">-</span><span class="number">14</span>).<span class="ident">ic</span>(), <span class="ident">midic</span>(<span class="number">10</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_steps_true</span>() {
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="op">-</span><span class="number">2</span>..<span class="number">2</span> {
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="ident">i</span>).<span class="ident">is_step</span>());
+            <span class="macro">assert!</span>(<span class="ident">midi</span>(<span class="ident">i</span>).<span class="ident">is_step</span>());
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_steps_false</span>() {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="number">3</span>).<span class="ident">is_step</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="op">-</span><span class="number">3</span>).<span class="ident">is_step</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="number">11</span>).<span class="ident">is_step</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="op">-</span><span class="number">11</span>).<span class="ident">is_step</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="number">12</span>).<span class="ident">is_step</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="op">-</span><span class="number">12</span>).<span class="ident">is_step</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="number">13</span>).<span class="ident">is_step</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="op">-</span><span class="number">13</span>).<span class="ident">is_step</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="number">3</span>).<span class="ident">is_step</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="op">-</span><span class="number">3</span>).<span class="ident">is_step</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="number">11</span>).<span class="ident">is_step</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="op">-</span><span class="number">11</span>).<span class="ident">is_step</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="number">12</span>).<span class="ident">is_step</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="op">-</span><span class="number">12</span>).<span class="ident">is_step</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="number">13</span>).<span class="ident">is_step</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">midi</span>(<span class="op">-</span><span class="number">13</span>).<span class="ident">is_step</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_class_additive</span>() {
         <span class="comment">//todo: do property testing</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">7</span>) <span class="op">+</span> <span class="ident">midic</span>(<span class="number">7</span>), <span class="ident">midic</span>(<span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">midic</span>(<span class="number">4</span>), <span class="ident">midic</span>(<span class="number">10</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="op">-</span><span class="ident">midic</span>(<span class="number">2</span>), <span class="ident">midic</span>(<span class="number">10</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">7</span>) <span class="op">+</span> <span class="ident">midic</span>(<span class="number">7</span>), <span class="ident">midic</span>(<span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">midic</span>(<span class="number">4</span>), <span class="ident">midic</span>(<span class="number">10</span>));
+        <span class="macro">assert_eq!</span>(<span class="op">-</span><span class="ident">midic</span>(<span class="number">2</span>), <span class="ident">midic</span>(<span class="number">10</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_class_multiplication</span>() {
         <span class="comment">//todo: do property testing</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">7</span>) <span class="op">*</span> <span class="number">2</span>, <span class="ident">midic</span>(<span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">7</span>) <span class="op">*</span> <span class="op">-</span><span class="number">1</span>, <span class="ident">midic</span>(<span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">7</span>) <span class="op">*</span> <span class="number">2</span>, <span class="ident">midic</span>(<span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">7</span>) <span class="op">*</span> <span class="op">-</span><span class="number">1</span>, <span class="ident">midic</span>(<span class="number">5</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_class_direction</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">0</span>).<span class="ident">direction</span>(), <span class="ident">Ordering</span>::<span class="ident">Equal</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">6</span>).<span class="ident">direction</span>(), <span class="ident">Ordering</span>::<span class="ident">Equal</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">0</span>).<span class="ident">direction</span>(), <span class="ident">Ordering::Equal</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">6</span>).<span class="ident">direction</span>(), <span class="ident">Ordering::Equal</span>);
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">5</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="ident">i</span>).<span class="ident">direction</span>(), <span class="ident">Ordering</span>::<span class="ident">Greater</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">12</span> <span class="op">-</span> <span class="ident">i</span>).<span class="ident">direction</span>(), <span class="ident">Ordering</span>::<span class="ident">Less</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="ident">i</span>).<span class="ident">direction</span>(), <span class="ident">Ordering::Greater</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">12</span> <span class="op">-</span> <span class="ident">i</span>).<span class="ident">direction</span>(), <span class="ident">Ordering::Less</span>);
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">7</span>).<span class="ident">abs</span>(), <span class="ident">midic</span>(<span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">7</span>).<span class="ident">abs</span>(), <span class="ident">midic</span>(<span class="number">5</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_class_class_conversion</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">4</span>).<span class="ident">ic</span>(), <span class="ident">midic</span>(<span class="number">4</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">4</span>).<span class="ident">emb</span>(), <span class="ident">midi</span>(<span class="number">4</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">4</span>).<span class="ident">ic</span>(), <span class="ident">midic</span>(<span class="number">4</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">4</span>).<span class="ident">emb</span>(), <span class="ident">midi</span>(<span class="number">4</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_class_steps_true</span>() {
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="op">-</span><span class="number">2</span>..<span class="number">2</span> {
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="ident">i</span>).<span class="ident">is_step</span>());
+            <span class="macro">assert!</span>(<span class="ident">midic</span>(<span class="ident">i</span>).<span class="ident">is_step</span>());
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_class_steps_false</span>() {
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">3</span>..<span class="number">9</span> {
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">midic</span>(<span class="ident">i</span>).<span class="ident">is_step</span>());
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">midic</span>(<span class="ident">i</span>).<span class="ident">is_step</span>());
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_pitch_conversion</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">63</span>).<span class="ident">to_pitch</span>(), <span class="ident">midip</span>(<span class="number">63</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midip</span>(<span class="number">42</span>).<span class="ident">to_interval</span>(), <span class="ident">midi</span>(<span class="number">42</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">63</span>).<span class="ident">to_pitch</span>(), <span class="ident">midip</span>(<span class="number">63</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midip</span>(<span class="number">42</span>).<span class="ident">to_interval</span>(), <span class="ident">midi</span>(<span class="number">42</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">3</span>).<span class="ident">to_pitch</span>(), <span class="ident">midipc</span>(<span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midipc</span>(<span class="number">4</span>).<span class="ident">to_interval</span>(), <span class="ident">midic</span>(<span class="number">4</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">3</span>).<span class="ident">to_pitch</span>(), <span class="ident">midipc</span>(<span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midipc</span>(<span class="number">4</span>).<span class="ident">to_interval</span>(), <span class="ident">midic</span>(<span class="number">4</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midip</span>(<span class="number">63</span>).<span class="ident">pc</span>(), <span class="ident">midipc</span>(<span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midipc</span>(<span class="number">3</span>).<span class="ident">pc</span>(), <span class="ident">midipc</span>(<span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midipc</span>(<span class="number">3</span>).<span class="ident">emb</span>(), <span class="ident">midip</span>(<span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midip</span>(<span class="number">63</span>).<span class="ident">pc</span>(), <span class="ident">midipc</span>(<span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midipc</span>(<span class="number">3</span>).<span class="ident">pc</span>(), <span class="ident">midipc</span>(<span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midipc</span>(<span class="number">3</span>).<span class="ident">emb</span>(), <span class="ident">midip</span>(<span class="number">3</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_pitch_arithmetics</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midip</span>(<span class="number">63</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="number">7</span>), <span class="ident">midip</span>(<span class="number">70</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midip</span>(<span class="number">64</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="op">-</span><span class="number">4</span>), <span class="ident">midip</span>(<span class="number">60</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midip</span>(<span class="number">63</span>) <span class="op">-</span> <span class="ident">midi</span>(<span class="number">7</span>), <span class="ident">midip</span>(<span class="number">56</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midip</span>(<span class="number">67</span>).<span class="ident">interval_from</span>(<span class="ident">midip</span>(<span class="number">61</span>)), <span class="ident">midi</span>(<span class="number">6</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midip</span>(<span class="number">67</span>).<span class="ident">interval_to</span>(<span class="ident">midip</span>(<span class="number">61</span>)), <span class="ident">midi</span>(<span class="op">-</span><span class="number">6</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midip</span>(<span class="number">63</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="number">7</span>), <span class="ident">midip</span>(<span class="number">70</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midip</span>(<span class="number">64</span>) <span class="op">+</span> <span class="ident">midi</span>(<span class="op">-</span><span class="number">4</span>), <span class="ident">midip</span>(<span class="number">60</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midip</span>(<span class="number">63</span>) <span class="op">-</span> <span class="ident">midi</span>(<span class="number">7</span>), <span class="ident">midip</span>(<span class="number">56</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midip</span>(<span class="number">67</span>).<span class="ident">interval_from</span>(<span class="ident">midip</span>(<span class="number">61</span>)), <span class="ident">midi</span>(<span class="number">6</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midip</span>(<span class="number">67</span>).<span class="ident">interval_to</span>(<span class="ident">midip</span>(<span class="number">61</span>)), <span class="ident">midi</span>(<span class="op">-</span><span class="number">6</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_pitch_class_arithmetics</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midipc</span>(<span class="number">63</span>) <span class="op">+</span> <span class="ident">midic</span>(<span class="number">7</span>), <span class="ident">midipc</span>(<span class="number">70</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midipc</span>(<span class="number">64</span>) <span class="op">+</span> <span class="ident">midic</span>(<span class="op">-</span><span class="number">4</span>), <span class="ident">midipc</span>(<span class="number">60</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midipc</span>(<span class="number">63</span>) <span class="op">-</span> <span class="ident">midic</span>(<span class="number">7</span>), <span class="ident">midipc</span>(<span class="number">56</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midipc</span>(<span class="number">67</span>).<span class="ident">interval_from</span>(<span class="ident">midipc</span>(<span class="number">61</span>)), <span class="ident">midic</span>(<span class="number">6</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midipc</span>(<span class="number">67</span>).<span class="ident">interval_to</span>(<span class="ident">midipc</span>(<span class="number">61</span>)), <span class="ident">midic</span>(<span class="op">-</span><span class="number">6</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midipc</span>(<span class="number">63</span>) <span class="op">+</span> <span class="ident">midic</span>(<span class="number">7</span>), <span class="ident">midipc</span>(<span class="number">70</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midipc</span>(<span class="number">64</span>) <span class="op">+</span> <span class="ident">midic</span>(<span class="op">-</span><span class="number">4</span>), <span class="ident">midipc</span>(<span class="number">60</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midipc</span>(<span class="number">63</span>) <span class="op">-</span> <span class="ident">midic</span>(<span class="number">7</span>), <span class="ident">midipc</span>(<span class="number">56</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midipc</span>(<span class="number">67</span>).<span class="ident">interval_from</span>(<span class="ident">midipc</span>(<span class="number">61</span>)), <span class="ident">midic</span>(<span class="number">6</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">midipc</span>(<span class="number">67</span>).<span class="ident">interval_to</span>(<span class="ident">midipc</span>(<span class="number">61</span>)), <span class="ident">midic</span>(<span class="op">-</span><span class="number">6</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">midi_integer_conversion</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midi</span>(<span class="number">60</span>), <span class="ident">MidiInterval</span>::<span class="ident">from</span>(<span class="number">60</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">i32</span>::<span class="ident">from</span>(<span class="ident">midi</span>(<span class="number">60</span>)), <span class="number">60</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midic</span>(<span class="number">60</span>), <span class="ident">MidiIC</span>::<span class="ident">from</span>(<span class="number">60</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">i32</span>::<span class="ident">from</span>(<span class="ident">midic</span>(<span class="number">60</span>)), <span class="number">0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midip</span>(<span class="number">60</span>), <span class="ident">MidiPitch</span>::<span class="ident">from</span>(<span class="number">60</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">i32</span>::<span class="ident">from</span>(<span class="ident">midip</span>(<span class="number">60</span>)), <span class="number">60</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">midipc</span>(<span class="number">60</span>), <span class="ident">MidiPC</span>::<span class="ident">from</span>(<span class="number">60</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">i32</span>::<span class="ident">from</span>(<span class="ident">midipc</span>(<span class="number">60</span>)), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">midi</span>(<span class="number">60</span>), <span class="ident">MidiInterval::from</span>(<span class="number">60</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">i32::from</span>(<span class="ident">midi</span>(<span class="number">60</span>)), <span class="number">60</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">midic</span>(<span class="number">60</span>), <span class="ident">MidiIC::from</span>(<span class="number">60</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">i32::from</span>(<span class="ident">midic</span>(<span class="number">60</span>)), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">midip</span>(<span class="number">60</span>), <span class="ident">MidiPitch::from</span>(<span class="number">60</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">i32::from</span>(<span class="ident">midip</span>(<span class="number">60</span>)), <span class="number">60</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">midipc</span>(<span class="number">60</span>), <span class="ident">MidiPC::from</span>(<span class="number">60</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">i32::from</span>(<span class="ident">midipc</span>(<span class="number">60</span>)), <span class="number">0</span>);
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pitches"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pitches" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</body></html>
