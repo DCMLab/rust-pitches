@@ -6,4 +6,5 @@ Provides types and traits for representing and working with intervals and pitche
 Follows the same API and notation formats as the companion libraries:
 - [Pitches.jl](https://github.com/DCMLab/Pitches.jl/) (Julia)
 - [haskell-musicology/pitch](https://github.com/DCMLab/haskell-musicology/tree/master/musicology-pitch) (Haskell)
+- [purescript-pitches](https://github.com/DCMLab/purescript-pitches) (Purescript)
 - [pitchtypes](https://github.com/DCMLab/pitchtypes) (Python)
