@@ -906,6 +906,8 @@
 <span id="906">906</span>
 <span id="907">907</span>
 <span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Spelled (diatonic) intervals and pitches (as used in Western notation).</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Represents pitches (specific) intervals in the diatonic system,</span>
@@ -1803,6 +1805,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">rsp</span>(<span class="string">&quot;Eb4&quot;</span>) <span class="op">-</span> <span class="ident">rsi</span>(<span class="string">&quot;P5:0&quot;</span>), <span class="ident">rsp</span>(<span class="string">&quot;Ab3&quot;</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">rsp</span>(<span class="string">&quot;G4&quot;</span>).<span class="ident">interval_from</span>(<span class="ident">rsp</span>(<span class="string">&quot;C#4&quot;</span>)), <span class="ident">rsi</span>(<span class="string">&quot;d5:0&quot;</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">rsp</span>(<span class="string">&quot;G4&quot;</span>).<span class="ident">interval_to</span>(<span class="ident">rsp</span>(<span class="string">&quot;C#4&quot;</span>)), <span class="ident">rsi</span>(<span class="string">&quot;-d5:0&quot;</span>));
+        <span class="macro">assert!</span>(<span class="ident">rsp</span>(<span class="string">&quot;C-1&quot;</span>) <span class="op">&gt;</span> <span class="ident">rsp</span>(<span class="string">&quot;Cb-1&quot;</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1812,6 +1815,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">rspc</span>(<span class="string">&quot;Eb&quot;</span>) <span class="op">-</span> <span class="ident">rsic</span>(<span class="string">&quot;P5&quot;</span>), <span class="ident">rspc</span>(<span class="string">&quot;Ab&quot;</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">rspc</span>(<span class="string">&quot;G&quot;</span>).<span class="ident">interval_from</span>(<span class="ident">rspc</span>(<span class="string">&quot;C#&quot;</span>)), <span class="ident">rsic</span>(<span class="string">&quot;d5&quot;</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">rspc</span>(<span class="string">&quot;G&quot;</span>).<span class="ident">interval_to</span>(<span class="ident">rspc</span>(<span class="string">&quot;C#&quot;</span>)), <span class="ident">rsic</span>(<span class="string">&quot;a4&quot;</span>));
+        <span class="macro">assert!</span>(<span class="ident">rspc</span>(<span class="string">&quot;C&quot;</span>) <span class="op">&gt;</span> <span class="ident">rspc</span>(<span class="string">&quot;Cb&quot;</span>));
     }
 }
 </code></pre></div>
