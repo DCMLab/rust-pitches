@@ -895,6 +895,7 @@ mod tests {
         assert_eq!(rsp("Eb4") - rsi("P5:0"), rsp("Ab3"));
         assert_eq!(rsp("G4").interval_from(rsp("C#4")), rsi("d5:0"));
         assert_eq!(rsp("G4").interval_to(rsp("C#4")), rsi("-d5:0"));
+        assert!(rsp("C-1") > rsp("Cb-1"));
     }
 
     #[test]
@@ -904,5 +905,6 @@ mod tests {
         assert_eq!(rspc("Eb") - rsic("P5"), rspc("Ab"));
         assert_eq!(rspc("G").interval_from(rspc("C#")), rsic("d5"));
         assert_eq!(rspc("G").interval_to(rspc("C#")), rsic("a4"));
+        assert!(rspc("C") > rspc("Cb"));
     }
 }
