@@ -1,3 +1,4 @@
-var N = null;var sourcesIndex = {};
-sourcesIndex["pitches"] = {"name":"","dirs":[{"name":"midi","files":["parsing.rs"]},{"name":"spelled","files":["parsing.rs"]},{"name":"util","files":["parsing.rs"]}],"files":["lib.rs","midi.rs","spelled.rs","util.rs"]};
+var sourcesIndex = JSON.parse('{\
+"pitches":["",[["midi",[],["parsing.rs"]],["spelled",[],["parsing.rs"]],["util",[],["parsing.rs"]]],["lib.rs","midi.rs","spelled.rs","util.rs"]]\
+}');
 createSourceSidebar();
