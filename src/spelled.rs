@@ -161,9 +161,11 @@ impl PartialOrd for SpelledInterval {
 
 impl Ord for SpelledInterval {
     fn cmp(&self, other: &Self) -> Ordering {
-        let self_rep = (self.diasteps(), self.alteration());
-        let other_rep = (other.diasteps(), other.alteration());
-        self_rep.cmp(&other_rep)
+        let diff = *self - *other;
+        return diff.direction();
+        // let self_rep = (self.diasteps(), self.alteration());
+        // let other_rep = (other.diasteps(), other.alteration());
+        // self_rep.cmp(&other_rep)
     }
 }
 
@@ -225,7 +227,7 @@ impl Interval for SpelledInterval {
     }
 
     fn direction(self) -> Ordering {
-        self.diasteps().cmp(&0)
+        (self.diasteps(), (self.fifths + 1).div_euclid(7)).cmp(&(0,0))
     }
 }
 
@@ -379,7 +381,7 @@ impl Interval for SpelledIC {
 
         let d = self.diasteps();
         if d == 0 {
-            Ordering::Equal
+            (self.fifths + 1).div_euclid(7).cmp(&0)
         } else if d < 4 {
             Ordering::Greater
         } else {
@@ -652,6 +654,7 @@ mod tests {
         assert_eq!("-M3:1".parse(), Ok(SpelledInterval::new(-4, 1)));
         assert_eq!("C♭4".parse(), Ok(spelledp(-7, 8)));
         assert_eq!("Cb4".parse(), Ok(spelledp(-7, 8)));
+        assert_eq!("Cb-1".parse(), Ok(spelledp(-7, 3)));
         assert_eq!("m3".parse(), Ok(SpelledIC::new(-3)));
         assert_eq!("-m3".parse(), Ok(SpelledIC::new(3)));
         assert_eq!("C♯".parse(), Ok(spc(7)));
@@ -719,15 +722,17 @@ mod tests {
 
     #[test]
     fn spelled_accessors_edge_cases() {
-        assert_eq!(rsic("P4").alteration(), 0);
-        assert_eq!(rsic("M7").alteration(), 0);
         assert_eq!(rsi("-P4:0").alteration(), 0);
         assert_eq!(rsi("-M7:0").alteration(), 0);
-
-        assert_eq!(rsic("a4").alteration(), 1);
-        assert_eq!(rsic("m7").alteration(), -1);
         assert_eq!(rsi("-a4:0").alteration(), 1);
         assert_eq!(rsi("-m7:0").alteration(), -1);
+        assert_eq!(rsi("d1:0").alteration(), 1); // d1:0 == -a1:0
+
+        assert_eq!(rsic("a4").alteration(), 1);
+        assert_eq!(rsic("P4").alteration(), 0);
+        assert_eq!(rsic("M7").alteration(), 0);
+        assert_eq!(rsic("m7").alteration(), -1);
+        assert_eq!(rsic("d1").alteration(), -1);
 
         assert_eq!(rspc("F").alteration(), 0);
         assert_eq!(rspc("B").alteration(), 0);
@@ -762,10 +767,14 @@ mod tests {
     fn spelled_direction() {
         assert_eq!(rsi("m2:0").direction(), Ordering::Greater);
         assert_eq!(rsi("P1:0").direction(), Ordering::Equal);
-        assert_eq!(rsi("a1:0").direction(), Ordering::Equal);
-        assert_eq!(rsi("d1:0").direction(), Ordering::Equal);
+        assert_eq!(rsi("a1:0").direction(), Ordering::Greater);
+        assert_eq!(rsi("d1:0").direction(), Ordering::Less);
         assert_eq!(rsi("-m3:0").direction(), Ordering::Less);
+        assert_eq!(rsi("P4:0").direction(), Ordering::Greater);
+        assert_eq!(rsi("-M7:0").direction(), Ordering::Less);
         assert_eq!(rsi("-m3:0").abs(), rsi("m3:0"));
+        assert!(rsi("m2:0") < rsi("M2:0"));
+        assert!(rsi("-m2:0") > rsi("-M2:0"));
     }
 
     #[test]
@@ -829,8 +838,10 @@ mod tests {
     fn spelled_class_direction() {
         assert_eq!(rsic("m2").direction(), Ordering::Greater);
         assert_eq!(rsic("P1").direction(), Ordering::Equal);
-        assert_eq!(rsic("a1").direction(), Ordering::Equal);
-        assert_eq!(rsic("d1").direction(), Ordering::Equal);
+        assert_eq!(rsic("a1").direction(), Ordering::Greater);
+        assert_eq!(rsic("d1").direction(), Ordering::Less);
+        assert_eq!(rsic("P4").direction(), Ordering::Greater);
+        assert_eq!(rsic("-M7").direction(), Ordering::Greater);
         assert_eq!(rsic("-m2").direction(), Ordering::Less);
         assert_eq!(rsic("-m3").direction(), Ordering::Less);
         assert_eq!(rsic("-m3").abs(), rsic("m3"));
